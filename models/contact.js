@@ -6,35 +6,39 @@ const schema = mongoose.Schema({
   name: {
     type: String,
     required: [true, "Set name for contact"],
-    unique: [true, "User with this name is already registered"]
+    unique: [true, "User with this name is already registered"],
   },
   email: {
     type: String,
-    unique: [true, "User with this email is already registered"]
+    unique: [true, "User with this email is already registered"],
   },
   phone: {
     type: String,
-    unique: [true, "User with this phone is already registered"]
+    unique: [true, "User with this phone is already registered"],
   },
   favorite: {
     type: Boolean,
     default: false,
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+  }
 });
 
 const handleErrors = (error, data, next) => {
-  console.log("handleErrors")
-  const {name, code} = error;
-  if(name === "MongoServerError" && code === 11000) {
-    error.status = 409
+  console.log("handleErrors");
+  const { name, code } = error;
+  if (name === "MongoServerError" && code === 11000) {
+    error.status = 409;
   } else {
-    error.status = 400
+    error.status = 400;
   }
-  next()
-}
+  next();
+};
 
-schema.post("save", handleErrors)
+schema.post("save", handleErrors);
 
 const Contact = mongoose.model("contact", schema);
 
-module.exports = Contact
+module.exports = Contact;
