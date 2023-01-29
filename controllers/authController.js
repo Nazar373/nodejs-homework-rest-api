@@ -1,6 +1,11 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs/promises");
+const gravatar = require('gravatar');
+const Jimp = require('jimp');
 
 const { JWT_SECRET } = process.env;
 const {
@@ -16,6 +21,7 @@ const register = async (req, res) => {
   if (error) {
     throw res.status(400).json({ message: "missing required field" });
   }
+
   const candidate = await User.findOne({ email });
   if (candidate) {
     return res
@@ -26,16 +32,19 @@ const register = async (req, res) => {
   const salt = await bcrypt.genSalt();
   const hashPassword = await bcrypt.hash(password, salt);
 
+  const avatarURL = gravatar.url(email)
+
   const newUser = User.create({
     password: hashPassword,
     email,
     subscription,
+    avatarURL
   });
 
   res.status(201).json({
     status: "success",
     code: 201,
-    data: { user: newUser },
+    data: newUser,
   });
 };
 
@@ -94,10 +103,37 @@ const updateSubscriptionStatus = async (req, res) => {
   });
   res.status(201).json({ status: "success", code: 201, data: updated });
 };
+
+const uploadAvatar = async (req, res) => {
+  const { path: tmpPath, originalname } = req.file;
+  const { _id } = req.user
+  const avatarsDir = path.resolve(__dirname, "../public/avatars");
+  console.log({tmpPath, avatarsDir})
+  const resultUpload = path.resolve(avatarsDir, `${_id}_${originalname}`);
+  try {
+    await Jimp.read(tmpPath).then(img => {
+      return img
+        .resize(256, 256) // resize
+        .write(resultUpload); // save
+    })
+    .catch(err => {
+      console.error(err);
+    });
+    await fs.rename(tmpPath, resultUpload);
+    const avatarURL = path.join("public", "avatars", originalname);
+    await User.findByIdAndUpdate(_id, {avatarURL})
+    return res.json({status: "success", code: 200, data: avatarURL})
+  } catch (error) {
+      await fs.unlink(tmpPath);
+      throw error
+  }
+};
+
 module.exports = {
   register,
   login,
   getCurrent,
   logout,
   updateSubscriptionStatus,
+  uploadAvatar,
 };
