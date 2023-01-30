@@ -1,0 +1,29 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <form id="form" enctype="multipart/form-data">
+    <input type="file" name="avatar" multiple>
+    <button type="submit">Send file</button>
+  </form>
+</body>
+<script>
+  const form = document.getElementById("form");
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const data = new FormData();
+    data.append("avatar", this.elements.avatar.files[0])
+    console.log(this.elements.avatar.files[0])
+    // const url = "http://localhost:3001/upload";
+    // fetch(url, {
+    //   method
+    // })
+  })
+</script>
+</html> -->

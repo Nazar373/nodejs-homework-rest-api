@@ -21,10 +21,11 @@ const userSchema = mongoose.Schema(
     },
     token: {
       type: String,
-      default: null
-    }
+      default: null,
+    },
+    avatarURL: String,
   },
-  { versionKey: false, timestamps: true }
+  { versionKey: false }
 );
 
 const joiRegisterSchema = Joi.object({
@@ -32,6 +33,7 @@ const joiRegisterSchema = Joi.object({
   email: Joi.string()
     .required()
     .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } }),
+  avatarURL: Joi.string(),
 });
 
 const joiLoginSchema = Joi.object({
@@ -43,8 +45,13 @@ const joiLoginSchema = Joi.object({
 
 const joiSubscriptionSchema = Joi.object({
   subscription: Joi.string().valid("starter", "pro", "business"),
-})
+});
 
 const User = mongoose.model("user", userSchema);
 
-module.exports = { User, joiRegisterSchema, joiLoginSchema, joiSubscriptionSchema };
+module.exports = {
+  User,
+  joiRegisterSchema,
+  joiLoginSchema,
+  joiSubscriptionSchema,
+};
