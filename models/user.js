@@ -24,7 +24,16 @@ const userSchema = mongoose.Schema(
       default: null,
     },
     avatarURL: String,
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      required: [true, 'Verify token is required'],
+    },
   },
+  
   { versionKey: false }
 );
 
@@ -33,7 +42,7 @@ const joiRegisterSchema = Joi.object({
   email: Joi.string()
     .required()
     .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } }),
-  avatarURL: Joi.string(),
+  avatarURL: Joi.string()
 });
 
 const joiLoginSchema = Joi.object({
@@ -46,6 +55,11 @@ const joiLoginSchema = Joi.object({
 const joiSubscriptionSchema = Joi.object({
   subscription: Joi.string().valid("starter", "pro", "business"),
 });
+const joiEmailSchema = Joi.object({
+  email: Joi.string()
+    .required()
+    .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } }),
+});
 
 const User = mongoose.model("user", userSchema);
 
@@ -54,4 +68,5 @@ module.exports = {
   joiRegisterSchema,
   joiLoginSchema,
   joiSubscriptionSchema,
+  joiEmailSchema
 };
